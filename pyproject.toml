@@ -1,0 +1,33 @@
+[project]
+name = "mgenre-classification"
+version = "0.1.0"
+description = "FMA Small music genre CNN and local upload website"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn>=0.34",
+  "python-multipart>=0.0.20",
+  "jinja2>=3.1",
+  "numpy>=2.0",
+  "pandas>=2.2",
+  "librosa>=0.11",
+  "soundfile>=0.13",
+  "imageio-ffmpeg>=0.6",
+  "httpx>=0.28",
+  "torch>=2.6",
+  "scikit-learn>=1.6",
+  "matplotlib>=3.10",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["music_genre"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Genre Classifier</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/links.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="brand"><span class="brand-mark">♫</span><span>Sound<span class="brand-accent">Scope</span></span></div>
+      <span class="eyebrow">Music genre classification</span>
+    </header>
+    <main>
+      <section class="hero">
+        <span class="pill"><span class="pill-dot"></span> CNN trained on FMA Small</span>
+        <h1>Hear the shape<br>of your <em>sound.</em></h1>
+        <p>Upload a song or video, or paste a direct media link, to see its likely genre and the mel spectrogram the model uses to listen.</p>
+      </section>
+      <section class="panel upload-panel" aria-labelledby="upload-heading">
+        <div class="section-heading"><div><span class="step">01 / ANALYZE</span><h2 id="upload-heading">Choose your media</h2></div><span class="format-note">Audio or video</span></div>
+        <form action="/predict" method="post" enctype="multipart/form-data">
+          <label class="drop-zone" for="audio-input">
+            <span class="upload-icon">↑</span>
+            <strong>Drop a file here or browse files</strong>
+            <span>MP3 · WAV · FLAC · MP4 · WebM · MOV<br>Up to 50 MB · at least 3 seconds</span>
+            <input id="audio-input" type="file" name="audio" accept=".mp3,.wav,.flac,.mp4,.webm,.mov,audio/mpeg,audio/wav,audio/flac,video/mp4,video/webm,video/quicktime" required>
+          </label>
+          <div class="upload-footer"><span id="selected-file">No file selected</span><button type="submit">Analyze track <span aria-hidden="true">↗</span></button></div>
+        </form>
+        <div class="or-divider"><span>or paste a direct media link</span></div>
+        <form action="/predict-link" method="post" class="link-form">
+          <label for="media-url">Audio or video file URL</label>
+          <div class="link-input-row"><input id="media-url" type="url" name="media_url" value="{{ media_url or '' }}" placeholder="https://example.com/song.mp3" required><button type="submit">Analyze link <span aria-hidden="true">↗</span></button></div>
+          <p class="link-hint">Direct HTTPS links to MP3, WAV, FLAC, MP4, WebM, or MOV files work here. Spotify and YouTube page links cannot supply audio to the model; upload an authorized media file instead.</p>
+        </form>
+        {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+      </section>
+      {% if result %}
+      <section class="results" aria-labelledby="result-heading">
+        <div class="section-heading"><div><span class="step">02 / RESULT</span><h2 id="result-heading">Your sound, decoded.</h2></div><span class="format-note">{{ filename }}</span></div>
+        <div class="result-grid">
+          <article class="panel prediction"><span class="card-label">TOP GENRE</span><div class="genre-name">{{ result.genre }}</div><p>{{ '%.1f'|format(result.confidence * 100) }}% model score</p><div class="rule"></div><p class="analysis-range">Analyzed {{ result.analyzed_from }}–{{ result.analyzed_to }} seconds of your track</p></article>
+          <article class="panel scores"><span class="card-label">ALL GENRE SCORES</span><div class="score-list">{% for item in result.scores %}<div class="score-row"><div class="score-text"><span>{{ item.genre }}</span><span>{{ item.percent }}%</span></div><div class="score-track"><span style="width: {{ item.percent }}%"></span></div></div>{% endfor %}</div></article>
+        </div>
+        <article class="panel spectrum"><div class="section-heading"><div><span class="card-label">MEL SPECTROGRAM</span><h3>A picture of the sound</h3></div><span class="format-note">128 frequency bands</span></div><img src="data:image/png;base64,{{ result.spectrogram }}" alt="Mel spectrogram of the analyzed music"></article>
+      </section>
+      {% endif %}
+    </main>
+    <footer>Eight genres · FMA Small dataset · Local analysis</footer>
+  </div>
+  <script>document.getElementById('audio-input').addEventListener('change', e => { document.getElementById('selected-file').textContent = e.target.files[0]?.name || 'No file selected'; });</script>
+</body>
+</html>

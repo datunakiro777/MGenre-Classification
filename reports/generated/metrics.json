@@ -1,0 +1,172 @@
+{
+  "dataset": "FMA Small",
+  "seed": 42,
+  "device": "mps",
+  "usable_tracks_by_split": {
+    "test": 800,
+    "training": 6394,
+    "validation": 800
+  },
+  "skipped_tracks": [
+    {
+      "track_id": 98565,
+      "reason": "Audio must be at least three seconds long."
+    },
+    {
+      "track_id": 98567,
+      "reason": "Audio must be at least three seconds long."
+    },
+    {
+      "track_id": 98569,
+      "reason": "Audio must be at least three seconds long."
+    },
+    {
+      "track_id": 99134,
+      "reason": "Could not read this audio file. Check that it contains valid audio."
+    },
+    {
+      "track_id": 108925,
+      "reason": "Could not read this audio file. Check that it contains valid audio."
+    },
+    {
+      "track_id": 133297,
+      "reason": "Could not read this audio file. Check that it contains valid audio."
+    }
+  ],
+  "best_epoch": 7,
+  "test_accuracy": 0.445,
+  "test_macro_f1": 0.4315350815983022,
+  "test_loss": 1.496019162479788,
+  "per_class": {
+    "Electronic": {
+      "precision": 0.8,
+      "recall": 0.4,
+      "f1-score": 0.5333333333333333,
+      "support": 100.0
+    },
+    "Experimental": {
+      "precision": 0.4117647058823529,
+      "recall": 0.14,
+      "f1-score": 0.208955223880597,
+      "support": 100.0
+    },
+    "Folk": {
+      "precision": 0.2865853658536585,
+      "recall": 0.47,
+      "f1-score": 0.3560606060606061,
+      "support": 100.0
+    },
+    "Hip-Hop": {
+      "precision": 0.7029702970297029,
+      "recall": 0.71,
+      "f1-score": 0.7064676616915423,
+      "support": 100.0
+    },
+    "Instrumental": {
+      "precision": 0.3804347826086957,
+      "recall": 0.35,
+      "f1-score": 0.3645833333333333,
+      "support": 100.0
+    },
+    "International": {
+      "precision": 0.3706293706293706,
+      "recall": 0.53,
+      "f1-score": 0.43621399176954734,
+      "support": 100.0
+    },
+    "Pop": {
+      "precision": 0.3684210526315789,
+      "recall": 0.21,
+      "f1-score": 0.267515923566879,
+      "support": 100.0
+    },
+    "Rock": {
+      "precision": 0.4716981132075472,
+      "recall": 0.75,
+      "f1-score": 0.5791505791505791,
+      "support": 100.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      40,
+      3,
+      5,
+      10,
+      8,
+      20,
+      11,
+      3
+    ],
+    [
+      4,
+      14,
+      20,
+      2,
+      27,
+      12,
+      3,
+      18
+    ],
+    [
+      0,
+      5,
+      47,
+      0,
+      4,
+      11,
+      6,
+      27
+    ],
+    [
+      2,
+      0,
+      1,
+      71,
+      4,
+      14,
+      5,
+      3
+    ],
+    [
+      0,
+      6,
+      40,
+      1,
+      35,
+      8,
+      6,
+      4
+    ],
+    [
+      2,
+      1,
+      30,
+      4,
+      3,
+      53,
+      1,
+      6
+    ],
+    [
+      2,
+      0,
+      14,
+      12,
+      9,
+      19,
+      21,
+      23
+    ],
+    [
+      0,
+      5,
+      7,
+      1,
+      2,
+      6,
+      4,
+      75
+    ]
+  ]
+}
