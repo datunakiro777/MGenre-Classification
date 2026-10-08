@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <title>History — SoundScope</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css?v=4">
+  <link rel="stylesheet" href="/static/history.css?v=1">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="SoundScope home">
+        <span class="brand-mark" aria-hidden="true">≈</span>
+        <span>SoundScope</span>
+      </a>
+      <div class="header-actions">
+        <span class="header-note">Audio classification / v1</span>
+        <nav class="site-nav" aria-label="Main navigation"><a href="/">Analyze</a></nav>
+      </div>
+    </header>
+
+    <div class="process-strip">Your tracks <span aria-hidden="true">→</span> your results <span aria-hidden="true">→</span> ready to revisit</div>
+
+    <main class="main-content history-main">
+      <section class="history-hero" aria-labelledby="history-title">
+        <span class="section-label">Saved on this computer</span>
+        <h1 id="history-title">Your <em>history.</em></h1>
+        <p>Revisit your uploads, direct media links, genre predictions, scores, and sound maps.</p>
+        <div class="history-count">{{ total }} {{ 'analysis' if total == 1 else 'analyses' }} saved</div>
+      </section>
+
+      {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+      {% if entries %}
+      <section class="history-list" aria-label="Saved music analyses">
+        {% for entry in entries %}
+        <details class="history-entry">
+          <summary>
+            <span class="history-entry-main">
+              <span class="history-entry-source">{{ 'Upload' if entry.source_type == 'upload' else 'Direct link' }} / <time datetime="{{ entry.created_at }}">{{ entry.created_at_display }}</time></span>
+              <strong>{{ entry.filename }}</strong>
+            </span>
+            <span class="history-entry-result"><span>{{ entry.result.genre }}</span><b>{{ '%.1f'|format(entry.result.confidence * 100) }}%</b></span>
+            <span class="history-entry-arrow" aria-hidden="true">↗</span>
+          </summary>
+          <div class="history-detail">
+            <div class="history-detail-top">
+              <div><span class="section-label">Prediction</span><h2>{{ entry.result.genre }}</h2><p>{{ '%.1f'|format(entry.result.confidence * 100) }}% model score</p></div>
+              <dl>
+                <div><dt>Source</dt><dd>{{ 'Uploaded file' if entry.source_type == 'upload' else 'Direct media link' }}</dd></div>
+                <div><dt>File size</dt><dd>{{ entry.size_mb }} MB</dd></div>
+                <div><dt>Analyzed</dt><dd>{{ entry.result.analyzed_from }}–{{ entry.result.analyzed_to }} sec</dd></div>
+              </dl>
+            </div>
+            <div class="history-detail-grid">
+              <div class="history-scores">
+                <h3>Genre signal / all classes</h3>
+                <div class="score-list">
+                  {% for item in entry.result.scores %}
+                  <div class="score-row" aria-label="{{ item.genre }}: {{ item.percent }} percent">
+                    <span class="score-genre">{{ item.genre }}</span>
+                    <div class="score-track"><span class="score-fill{% if loop.first %} is-top{% endif %}" style="width: {{ item.percent }}%"></span></div>
+                    <span class="score-value">{{ item.percent }}%</span>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="history-sound">
+                <h3>Mel spectrogram</h3>
+                <img src="data:image/png;base64,{{ entry.result.spectrogram }}" alt="Mel spectrogram from {{ entry.filename }}" loading="lazy">
+                {% if entry.media_exists %}
+                  {% if entry.media_kind == 'video' %}
+                  <video controls preload="none" aria-label="Play {{ entry.filename }}"><source src="/history/{{ entry.id }}/media">Your browser cannot play this video.</video>
+                  {% elif entry.media_kind == 'audio' %}
+                  <audio controls preload="none" aria-label="Play {{ entry.filename }}"><source src="/history/{{ entry.id }}/media">Your browser cannot play this audio.</audio>
+                  {% endif %}
+                  <a class="download-link" href="/history/{{ entry.id }}/media" download="{{ entry.filename }}">Download original file ↗</a>
+                {% else %}
+                  <p class="media-missing">The original file is no longer available on this computer.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </details>
+        {% endfor %}
+      </section>
+
+      {% if max_page > 1 %}
+      <nav class="history-pagination" aria-label="History pages">
+        {% if page > 1 %}<a href="/history?page={{ page - 1 }}">← Newer</a>{% else %}<span></span>{% endif %}
+        <span>Page {{ page }} of {{ max_page }}</span>
+        {% if page < max_page %}<a href="/history?page={{ page + 1 }}">Older →</a>{% else %}<span></span>{% endif %}
+      </nav>
+      {% endif %}
+      {% elif not error %}
+      <section class="empty-history">
+        <span class="section-label">No saved tracks yet</span>
+        <h2>Your next upload starts here.</h2>
+        <p>New analyses will appear on this page. Earlier uploads were temporary and cannot be recovered.</p>
+        <a href="/">Analyze a track ↗</a>
+      </section>
+      {% endif %}
+    </main>
+
+    <footer class="site-footer">Saved locally / Eight genres / FMA Small</footer>
+  </div>
+</body>
+</html>

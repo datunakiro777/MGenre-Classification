@@ -1,9 +1,15 @@
 from fastapi.testclient import TestClient
+import pytest
 
 from music_genre import app as site
 
 
 client = TestClient(site.app)
+
+
+@pytest.fixture(autouse=True)
+def isolated_history(monkeypatch, tmp_path):
+    monkeypatch.setattr(site.history, "HISTORY_ROOT", tmp_path / "history")
 
 
 def test_home_page_has_upload_form():
@@ -13,6 +19,14 @@ def test_home_page_has_upload_form():
     assert 'name="audio"' in response.text
     assert 'name="media_url"' in response.text
     assert "Example result" in response.text
+    assert 'href="/history"' in response.text
+
+
+def test_history_starts_empty():
+    response = client.get("/history")
+    assert response.status_code == 200
+    assert "No saved tracks yet" in response.text
+    assert "Earlier uploads were temporary" in response.text
 
 
 def test_analyze_requires_one_source():
@@ -65,6 +79,16 @@ def test_shows_prediction_and_scores(monkeypatch, tmp_path):
     assert "Rock" in response.text
     assert "60.0%" in response.text
     assert "data:image/png;base64,aGVsbG8=" in response.text
+    assert "Saved to history" in response.text
+    saved = client.get("/history")
+    assert "song.mp3" in saved.text
+    assert "Rock" in saved.text
+    assert "60.0%" in saved.text
+    assert "data:image/png;base64,aGVsbG8=" in saved.text
+    media = client.get("/history/1/media")
+    assert media.status_code == 200
+    assert media.content == b"sample"
+    assert client.get("/history/999/media").status_code == 404
 
 
 def test_link_form_rejects_spotify(monkeypatch, tmp_path):
@@ -99,3 +123,7 @@ def test_link_form_classifies_direct_media(monkeypatch, tmp_path):
     assert response.status_code == 200
     assert "Media from example.com" in response.text
     assert "60.0%" in response.text
+    saved = client.get("/history")
+    assert "Media from example.com" in saved.text
+    assert "Direct link" in saved.text
+    assert client.get("/history/1/media").content == b"media"

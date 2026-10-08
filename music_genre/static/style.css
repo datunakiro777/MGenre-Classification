@@ -79,6 +79,25 @@ button { touch-action: manipulation; }
 
 .header-note { color: #b5b5b5; font-size: 13px; text-align: right; }
 
+.header-actions { display: flex; align-items: center; gap: 27px; }
+
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 43px;
+  padding: 9px 17px;
+  border: 1px solid #5d5d5d;
+  border-radius: 999px;
+  color: #f7f7f7;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-nav a:hover { border-color: #35f5ce; color: #35f5ce; }
+.brand:focus-visible, .site-nav a:focus-visible { outline: 3px solid #35f5ce; outline-offset: 4px; }
+
 .process-strip {
   padding: 19px 25px;
   background: #35f5ce;
@@ -337,6 +356,18 @@ button { touch-action: manipulation; }
   overflow-wrap: anywhere;
 }
 
+.saved-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+
+.saved-link:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.winner-card .history-error { max-width: 480px; margin-top: 15px; color: #ffe1e5; font-size: 12px; }
+
 .scores-card {
   min-width: 0;
   padding: 35px 36px;
@@ -444,6 +475,8 @@ button { touch-action: manipulation; }
   .brand { gap: 11px; font-size: 25px; }
   .brand-mark { width: 39px; height: 39px; font-size: 30px; }
   .header-note { font-size: 10px; }
+  .header-actions { gap: 12px; }
+  .site-nav a { min-height: 40px; padding: 8px 13px; font-size: 12px; }
   .process-strip { padding: 14px 18px; font-size: 11px; }
   .main-content { padding: 43px 24px 65px; }
   .hero { margin-bottom: 38px; }
@@ -465,6 +498,8 @@ button { touch-action: manipulation; }
   .brand { gap: 9px; font-size: 20px; }
   .brand-mark { width: 35px; height: 35px; font-size: 27px; }
   .header-note { display: none; }
+  .site-header { gap: 9px; }
+  .site-nav a { min-height: 39px; padding: 8px 11px; font-size: 11px; }
   .process-strip { padding: 13px 22px; font-size: 10px; letter-spacing: .08em; line-height: 1.6; }
   .process-strip span { margin: 0 2px; }
   .main-content { padding: 36px 16px 55px; }

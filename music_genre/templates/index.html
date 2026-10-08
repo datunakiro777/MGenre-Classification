@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111111">
   <title>SoundScope — Music Genre Classifier</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/static/style.css?v=3">
+  <link rel="stylesheet" href="/static/style.css?v=4">
   <script defer src="/static/app.js?v=2"></script>
 </head>
 <body data-has-result="{{ 'true' if result else 'false' }}">
@@ -17,7 +17,10 @@
         <span class="brand-mark" aria-hidden="true">≈</span>
         <span>SoundScope</span>
       </a>
-      <span class="header-note">Audio classification / v1</span>
+      <div class="header-actions">
+        <span class="header-note">Audio classification / v1</span>
+        <nav class="site-nav" aria-label="Main navigation"><a href="/history">History</a></nav>
+      </div>
     </header>
 
     <div class="process-strip">Sound in <span aria-hidden="true">→</span> spectrogram <span aria-hidden="true">→</span> eight genres <span aria-hidden="true">→</span> your result</div>
@@ -56,6 +59,8 @@
             <h2>{{ result.genre if result else 'Electronic' }}</h2>
             <p>{{ '%.1f'|format(result.confidence * 100) if result else '46.8' }}% model score{% if not result %} · illustrative{% endif %}</p>
             {% if result %}<p class="track-name">{{ filename }} · analyzed {{ result.analyzed_from }}–{{ result.analyzed_to }} seconds</p>{% endif %}
+            {% if history_id %}<a class="saved-link" href="/history">Saved to history ↗</a>{% endif %}
+            {% if history_error %}<p class="history-error" role="status">{{ history_error }}</p>{% endif %}
           </article>
 
           <article class="scores-card">
