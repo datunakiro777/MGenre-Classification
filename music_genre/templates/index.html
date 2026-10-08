@@ -3,55 +3,91 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Music Genre Classifier</title>
+  <meta name="theme-color" content="#111111">
+  <title>SoundScope — Music Genre Classifier</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/static/style.css">
-  <link rel="stylesheet" href="/static/links.css">
+  <link rel="stylesheet" href="/static/style.css?v=3">
+  <script defer src="/static/app.js?v=2"></script>
 </head>
-<body>
+<body data-has-result="{{ 'true' if result else 'false' }}">
+  {% set displayed_scores = result.scores if result else example_scores %}
   <div class="site-shell">
     <header class="site-header">
-      <div class="brand"><span class="brand-mark">♫</span><span>Sound<span class="brand-accent">Scope</span></span></div>
-      <span class="eyebrow">Music genre classification</span>
+      <a class="brand" href="/" aria-label="SoundScope home">
+        <span class="brand-mark" aria-hidden="true">≈</span>
+        <span>SoundScope</span>
+      </a>
+      <span class="header-note">Audio classification / v1</span>
     </header>
-    <main>
-      <section class="hero">
-        <span class="pill"><span class="pill-dot"></span> CNN trained on FMA Small</span>
-        <h1>Hear the shape<br>of your <em>sound.</em></h1>
-        <p>Upload a song or video, or paste a direct media link, to see its likely genre and the mel spectrogram the model uses to listen.</p>
+
+    <div class="process-strip">Sound in <span aria-hidden="true">→</span> spectrogram <span aria-hidden="true">→</span> eight genres <span aria-hidden="true">→</span> your result</div>
+
+    <main class="main-content">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-meta"><span>Music analysis system</span><span>Powered by a CNN</span></div>
+        <h1 id="hero-title">Decode<br><em>the beat.</em></h1>
+        <p>Drop a track. Get its likely genre, all eight model scores, and a close look at the sound that shaped the prediction.</p>
       </section>
-      <section class="panel upload-panel" aria-labelledby="upload-heading">
-        <div class="section-heading"><div><span class="step">01 / ANALYZE</span><h2 id="upload-heading">Choose your media</h2></div><span class="format-note">Audio or video</span></div>
-        <form action="/predict" method="post" enctype="multipart/form-data">
-          <label class="drop-zone" for="audio-input">
-            <span class="upload-icon">↑</span>
-            <strong>Drop a file here or browse files</strong>
-            <span>MP3 · WAV · FLAC · MP4 · WebM · MOV<br>Up to 50 MB · at least 3 seconds</span>
-            <input id="audio-input" type="file" name="audio" accept=".mp3,.wav,.flac,.mp4,.webm,.mov,audio/mpeg,audio/wav,audio/flac,video/mp4,video/webm,video/quicktime" required>
-          </label>
-          <div class="upload-footer"><span id="selected-file">No file selected</span><button type="submit">Analyze track <span aria-hidden="true">↗</span></button></div>
-        </form>
-        <div class="or-divider"><span>or paste a direct media link</span></div>
-        <form action="/predict-link" method="post" class="link-form">
-          <label for="media-url">Audio or video file URL</label>
-          <div class="link-input-row"><input id="media-url" type="url" name="media_url" value="{{ media_url or '' }}" placeholder="https://example.com/song.mp3" required><button type="submit">Analyze link <span aria-hidden="true">↗</span></button></div>
-          <p class="link-hint">Direct HTTPS links to MP3, WAV, FLAC, MP4, WebM, or MOV files work here. Spotify and YouTube page links cannot supply audio to the model; upload an authorized media file instead.</p>
-        </form>
-        {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
-      </section>
-      {% if result %}
-      <section class="results" aria-labelledby="result-heading">
-        <div class="section-heading"><div><span class="step">02 / RESULT</span><h2 id="result-heading">Your sound, decoded.</h2></div><span class="format-note">{{ filename }}</span></div>
-        <div class="result-grid">
-          <article class="panel prediction"><span class="card-label">TOP GENRE</span><div class="genre-name">{{ result.genre }}</div><p>{{ '%.1f'|format(result.confidence * 100) }}% model score</p><div class="rule"></div><p class="analysis-range">Analyzed {{ result.analyzed_from }}–{{ result.analyzed_to }} seconds of your track</p></article>
-          <article class="panel scores"><span class="card-label">ALL GENRE SCORES</span><div class="score-list">{% for item in result.scores %}<div class="score-row"><div class="score-text"><span>{{ item.genre }}</span><span>{{ item.percent }}%</span></div><div class="score-track"><span style="width: {{ item.percent }}%"></span></div></div>{% endfor %}</div></article>
+
+      <div class="analysis-layout">
+        <section class="input-panel" aria-labelledby="input-title">
+          <span class="section-label">01 // Feed the model</span>
+          <h2 id="input-title">Your track goes here.</h2>
+
+          <form id="analysis-form" action="/analyze" method="post" enctype="multipart/form-data">
+            <label class="drop-zone" id="drop-zone" for="audio-input">
+              <strong id="file-label">Drop a file or tap to browse</strong>
+              <span class="drop-detail">MP3 / WAV / FLAC / MP4 / WEBM / MOV<br>MAX 50 MB · MIN 3 SECONDS</span>
+              <span class="drop-arrow" aria-hidden="true">↗</span>
+              <input id="audio-input" type="file" name="audio" accept=".mp3,.wav,.flac,.mp4,.webm,.mov,audio/mpeg,audio/wav,audio/flac,video/mp4,video/webm,video/quicktime" aria-label="Choose an audio or video file">
+            </label>
+
+            <label class="url-label" for="media-url">Or direct media URL</label>
+            <input id="media-url" type="url" name="media_url" value="{{ media_url or '' }}" placeholder="https://example.com/song.mp3" inputmode="url" autocomplete="url">
+            <button class="analyze-button" type="submit">Analyze track <span aria-hidden="true">↗</span></button>
+          </form>
+          <p class="input-hint">Direct media files only. Spotify and YouTube page links cannot supply audio.</p>
+          {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+        </section>
+
+        <section class="output-panel" id="result" aria-label="Genre classification result">
+          <article class="winner-card">
+            <span class="winner-label">02 // {{ 'Your result' if result else 'Example result' }}</span>
+            <h2>{{ result.genre if result else 'Electronic' }}</h2>
+            <p>{{ '%.1f'|format(result.confidence * 100) if result else '46.8' }}% model score{% if not result %} · illustrative{% endif %}</p>
+            {% if result %}<p class="track-name">{{ filename }} · analyzed {{ result.analyzed_from }}–{{ result.analyzed_to }} seconds</p>{% endif %}
+          </article>
+
+          <article class="scores-card">
+            <h3>Genre signal / all classes</h3>
+            <div class="score-list" aria-label="{{ 'Genre scores' if result else 'Illustrative genre scores' }}">
+              {% for item in displayed_scores %}
+              <div class="score-row" aria-label="{{ item.genre }}: {{ item.percent }} percent">
+                <span class="score-genre">{{ item.genre }}</span>
+                <div class="score-track"><span class="score-fill{% if loop.first %} is-top{% endif %}" style="width: {{ item.percent }}%"></span></div>
+                <span class="score-value">{{ item.percent }}%</span>
+              </div>
+              {% endfor %}
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <section class="sound-map" aria-labelledby="sound-map-title">
+        <div class="sound-map-copy">
+          <span class="section-label">03 // Sound map</span>
+          <h2 id="sound-map-title">See the frequencies.</h2>
+          <p>128 mel bands / up to 30 sec</p>
         </div>
-        <article class="panel spectrum"><div class="section-heading"><div><span class="card-label">MEL SPECTROGRAM</span><h3>A picture of the sound</h3></div><span class="format-note">128 frequency bands</span></div><img src="data:image/png;base64,{{ result.spectrogram }}" alt="Mel spectrogram of the analyzed music"></article>
+        {% if result %}
+          <img class="spectrogram-image" src="data:image/png;base64,{{ result.spectrogram }}" alt="Mel spectrogram of the analyzed audio">
+        {% else %}
+          <div class="spectrogram-preview" role="img" aria-label="Decorative preview of a mel spectrogram"></div>
+        {% endif %}
       </section>
-      {% endif %}
     </main>
-    <footer>Eight genres · FMA Small dataset · Local analysis</footer>
+
+    <footer class="site-footer">Eight genres / FMA Small dataset / Local analysis</footer>
   </div>
-  <script>document.getElementById('audio-input').addEventListener('change', e => { document.getElementById('selected-file').textContent = e.target.files[0]?.name || 'No file selected'; });</script>
 </body>
 </html>

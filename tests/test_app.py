@@ -9,8 +9,24 @@ client = TestClient(site.app)
 def test_home_page_has_upload_form():
     response = client.get("/")
     assert response.status_code == 200
-    assert 'action="/predict"' in response.text
+    assert 'action="/analyze"' in response.text
     assert 'name="audio"' in response.text
+    assert 'name="media_url"' in response.text
+    assert "Example result" in response.text
+
+
+def test_analyze_requires_one_source():
+    response = client.post("/analyze", data={"media_url": ""})
+    assert "Choose a file or paste a direct media link" in response.text
+
+
+def test_analyze_rejects_two_sources():
+    response = client.post(
+        "/analyze",
+        data={"media_url": "https://example.com/song.mp3"},
+        files={"audio": ("song.mp3", b"sample", "audio/mpeg")},
+    )
+    assert "Choose either a file or a direct media link" in response.text
 
 
 def test_rejects_unsupported_file():
@@ -44,7 +60,7 @@ def test_shows_prediction_and_scores(monkeypatch, tmp_path):
         "scores": [{"genre": "Rock", "percent": 60.0}],
         "spectrogram": "aGVsbG8=", "analyzed_from": 0.0, "analyzed_to": 30.0,
     })
-    response = client.post("/predict", files={"audio": ("song.mp3", b"sample", "audio/mpeg")})
+    response = client.post("/analyze", files={"audio": ("song.mp3", b"sample", "audio/mpeg")})
     assert response.status_code == 200
     assert "Rock" in response.text
     assert "60.0%" in response.text
@@ -55,7 +71,11 @@ def test_link_form_rejects_spotify(monkeypatch, tmp_path):
     model = tmp_path / "model.pt"
     model.touch()
     monkeypatch.setattr(site, "MODEL_PATH", model)
-    response = client.post("/predict-link", data={"media_url": "https://open.spotify.com/track/abc"})
+    response = client.post(
+        "/analyze",
+        data={"media_url": "https://open.spotify.com/track/abc"},
+        files={"audio": ("", b"", "application/octet-stream")},
+    )
     assert response.status_code == 200
     assert "Spotify links cannot provide audio" in response.text
 
@@ -75,7 +95,7 @@ def test_link_form_classifies_direct_media(monkeypatch, tmp_path):
         "scores": [{"genre": "Rock", "percent": 60.0}],
         "spectrogram": "aGVsbG8=", "analyzed_from": 0.0, "analyzed_to": 30.0,
     })
-    response = client.post("/predict-link", data={"media_url": "https://example.com/song.mp3"})
+    response = client.post("/analyze", data={"media_url": "https://example.com/song.mp3"})
     assert response.status_code == 200
     assert "Media from example.com" in response.text
     assert "60.0%" in response.text

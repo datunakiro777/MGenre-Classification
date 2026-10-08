@@ -10,6 +10,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 import librosa.display
 import numpy as np
 import torch
@@ -34,21 +35,24 @@ def load_model(path: str):
 
 
 def render_spectrogram(spectrogram: np.ndarray) -> str:
-    fig, ax = plt.subplots(figsize=(10, 3.3), facecolor="#10182b")
-    ax.set_facecolor("#10182b")
+    neon = LinearSegmentedColormap.from_list(
+        "neon", ["#0e0e0e", "#34205f", "#7947d4", "#35f5ce", "#cbf86a"]
+    )
+    fig, ax = plt.subplots(figsize=(10, 2.7), facecolor="#171717")
+    ax.set_facecolor("#0e0e0e")
     image = librosa.display.specshow(
         spectrogram, x_axis="time", y_axis="mel", sr=22050,
-        hop_length=512, ax=ax, cmap="magma",
+        hop_length=512, ax=ax, cmap=neon,
     )
     ax.set(xlabel="Time (seconds)", ylabel="Frequency (Hz)")
-    ax.tick_params(colors="#b8c7de")
-    ax.xaxis.label.set_color("#b8c7de")
-    ax.yaxis.label.set_color("#b8c7de")
+    ax.tick_params(colors="#c8c8c8")
+    ax.xaxis.label.set_color("#c8c8c8")
+    ax.yaxis.label.set_color("#c8c8c8")
     for spine in ax.spines.values():
-        spine.set_color("#34425b")
+        spine.set_color("#666666")
     colorbar = fig.colorbar(image, ax=ax, pad=0.01)
-    colorbar.set_label("dB", color="#b8c7de")
-    colorbar.ax.tick_params(colors="#b8c7de")
+    colorbar.set_label("dB", color="#c8c8c8")
+    colorbar.ax.tick_params(colors="#c8c8c8")
     fig.tight_layout()
     buffer = io.BytesIO()
     fig.savefig(buffer, format="png", dpi=130, facecolor=fig.get_facecolor())

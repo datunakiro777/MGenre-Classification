@@ -21,9 +21,20 @@ MODEL_PATH = Path(os.environ.get("MGENRE_MODEL_PATH", "models/genre_cnn.pt"))
 TEMPLATES = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 app = FastAPI(title="Music Genre Classifier")
 app.mount("/static", StaticFiles(directory=str(Path(__file__).parent / "static")), name="static")
+EXAMPLE_SCORES = [
+    {"genre": "Electronic", "percent": 46.8},
+    {"genre": "Experimental", "percent": 18.4},
+    {"genre": "Hip-Hop", "percent": 11.3},
+    {"genre": "Instrumental", "percent": 9.7},
+    {"genre": "Rock", "percent": 6.2},
+    {"genre": "Pop", "percent": 4.1},
+    {"genre": "Folk", "percent": 2.3},
+    {"genre": "International", "percent": 1.2},
+]
 
 
 def page(request: Request, **context) -> HTMLResponse:
+    context.setdefault("example_scores", EXAMPLE_SCORES)
     return TEMPLATES.TemplateResponse(request=request, name="index.html", context=context)
 
 
@@ -70,3 +81,21 @@ async def predict_link(request: Request, media_url: str = Form(...)):
     except (AudioError, LinkError) as exc:
         return page(request, error=str(exc), media_url=media_url)
     return page(request, result=result, filename=f"Media from {source_host}")
+
+
+@app.post("/analyze", response_class=HTMLResponse)
+async def analyze(
+    request: Request,
+    audio: UploadFile | None = File(None),
+    media_url: str = Form(""),
+):
+    """Handle the single input form while keeping the original routes available."""
+    has_file = bool(audio and audio.filename)
+    has_link = bool(media_url.strip())
+    if has_file and has_link:
+        return page(request, error="Choose either a file or a direct media link.", media_url=media_url)
+    if has_file:
+        return await predict(request, audio)
+    if has_link:
+        return await predict_link(request, media_url)
+    return page(request, error="Choose a file or paste a direct media link to analyze.")
