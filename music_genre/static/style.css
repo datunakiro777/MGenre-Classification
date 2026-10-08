@@ -81,6 +81,8 @@ button { touch-action: manipulation; }
 
 .header-actions { display: flex; align-items: center; gap: 27px; }
 
+.site-nav { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+
 .site-nav a {
   display: inline-flex;
   align-items: center;
@@ -96,6 +98,8 @@ button { touch-action: manipulation; }
 }
 
 .site-nav a:hover { border-color: #35f5ce; color: #35f5ce; }
+.site-nav a[aria-current="page"],
+.site-nav a[aria-current="page"]:hover { border-color: #35f5ce; background: #35f5ce; color: #10231e; }
 .brand:focus-visible, .site-nav a:focus-visible { outline: 3px solid #35f5ce; outline-offset: 4px; }
 
 .process-strip {
@@ -474,9 +478,9 @@ button { touch-action: manipulation; }
   .site-header { min-height: 76px; padding: 14px 24px; }
   .brand { gap: 11px; font-size: 25px; }
   .brand-mark { width: 39px; height: 39px; font-size: 30px; }
-  .header-note { font-size: 10px; }
+  .header-note { display: none; }
   .header-actions { gap: 12px; }
-  .site-nav a { min-height: 40px; padding: 8px 13px; font-size: 12px; }
+  .site-nav a { min-height: 44px; padding: 8px 13px; font-size: 12px; }
   .process-strip { padding: 14px 18px; font-size: 11px; }
   .main-content { padding: 43px 24px 65px; }
   .hero { margin-bottom: 38px; }
@@ -493,13 +497,17 @@ button { touch-action: manipulation; }
   .spectrogram-preview, .spectrogram-image { min-height: 130px; }
 }
 
+@media (max-width: 560px) {
+  .site-header { flex-direction: column; align-items: stretch; gap: 15px; }
+  .header-actions, .site-nav { width: 100%; }
+  .site-nav a { flex: 1; }
+}
+
 @media (max-width: 480px) {
   .site-header { min-height: 69px; padding: 13px 18px; }
   .brand { gap: 9px; font-size: 20px; }
   .brand-mark { width: 35px; height: 35px; font-size: 27px; }
-  .header-note { display: none; }
-  .site-header { gap: 9px; }
-  .site-nav a { min-height: 39px; padding: 8px 11px; font-size: 11px; }
+  .site-nav a { padding: 8px 11px; font-size: 12px; }
   .process-strip { padding: 13px 22px; font-size: 10px; letter-spacing: .08em; line-height: 1.6; }
   .process-strip span { margin: 0 2px; }
   .main-content { padding: 36px 16px 55px; }

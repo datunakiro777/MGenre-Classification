@@ -19,7 +19,8 @@ def test_home_page_has_upload_form():
     assert 'name="audio"' in response.text
     assert 'name="media_url"' in response.text
     assert "Example result" in response.text
-    assert 'href="/history"' in response.text
+    assert '<a href="/" aria-current="page">Analyze</a>' in response.text
+    assert '<a href="/history">History</a>' in response.text
 
 
 def test_history_starts_empty():
@@ -27,6 +28,8 @@ def test_history_starts_empty():
     assert response.status_code == 200
     assert "No saved tracks yet" in response.text
     assert "Earlier uploads were temporary" in response.text
+    assert '<a href="/">Analyze</a>' in response.text
+    assert '<a href="/history" aria-current="page">History</a>' in response.text
 
 
 def test_analyze_requires_one_source():

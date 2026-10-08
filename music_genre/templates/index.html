@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111111">
   <title>SoundScope — Music Genre Classifier</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/static/style.css?v=4">
+  <link rel="stylesheet" href="/static/style.css?v=5">
   <script defer src="/static/app.js?v=2"></script>
 </head>
 <body data-has-result="{{ 'true' if result else 'false' }}">
@@ -19,7 +19,10 @@
       </a>
       <div class="header-actions">
         <span class="header-note">Audio classification / v1</span>
-        <nav class="site-nav" aria-label="Main navigation"><a href="/history">History</a></nav>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="/" aria-current="page">Analyze</a>
+          <a href="/history">History</a>
+        </nav>
       </div>
     </header>
 
